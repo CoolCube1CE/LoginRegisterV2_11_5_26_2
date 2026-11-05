@@ -1,0 +1,128 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="LoginRegisterV2.SiteMaster" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Beverage Store Management System</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+        // Runs immediately, before the page paints, so there's no flash of the wrong theme
+        (function () {
+            var theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.className = theme === 'dark' ? 'dark-theme' : '';
+        })();
+    </script>
+    <link rel="stylesheet" runat="server" href="~/Content/AppTheme.css" />
+    <link rel="stylesheet" runat="server" href="~/Content/AppLayout.css" />
+    <style>
+        /* Kept minimal and inline so core theme variables are available
+           immediately (before AppTheme.css finishes loading) and so the
+           dark-mode toggle keeps working exactly as before. */
+        :root {
+            --bg-color: #F2F6FB;
+            --text-color: #16202E;
+            --input-bg: #ffffff;
+            --input-border: #C7D3E2;
+            --link-color: #0B5FBF;
+        }
+        html.dark-theme {
+            --bg-color: #0F1620;
+            --text-color: #E8EEF7;
+            --input-bg: #1F2A3B;
+            --input-border: #3A4A62;
+            --link-color: #7FB6FF;
+        }
+    </style>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div class="app-layout">
+            <aside class="app-sidebar">
+                <div class="app-sidebar__brand">
+                    <span class="brand-icon" aria-hidden="true">🥤</span>
+                    <span class="brand-text">
+                        <strong>Beverage Store</strong>
+                        <span class="brand-sub">Management System</span>
+                    </span>
+                </div>
+
+                <asp:Panel ID="navBar" runat="server" CssClass="app-nav" Visible="false">
+                    <asp:HyperLink ID="lnkNavDashboard" runat="server" CssClass="app-nav__link">
+                        <span class="app-nav__icon" aria-hidden="true">📊</span><span class="app-nav__text">Dashboard</span>
+                    </asp:HyperLink>
+                    <asp:HyperLink ID="lnkNavInventory" runat="server" NavigateUrl="~/Inventory.aspx" CssClass="app-nav__link">
+                        <span class="app-nav__icon" aria-hidden="true">📦</span><span class="app-nav__text">Inventory</span>
+                    </asp:HyperLink>
+                    <asp:HyperLink ID="lnkNavStockTransactions" runat="server" NavigateUrl="~/StockTransactions.aspx" CssClass="app-nav__link">
+                        <span class="app-nav__icon" aria-hidden="true">🔄</span><span class="app-nav__text">Stock Transactions</span>
+                    </asp:HyperLink>
+                    <asp:HyperLink ID="lnkNavOrders" runat="server" NavigateUrl="~/Orders.aspx" CssClass="app-nav__link">
+                        <span class="app-nav__icon" aria-hidden="true">🧾</span><span class="app-nav__text">Orders</span>
+                    </asp:HyperLink>
+                </asp:Panel>
+
+                <asp:Panel ID="profileBar" runat="server" CssClass="profile-menu" Visible="false">
+                    <button type="button" class="profile-menu__trigger" id="profileTrigger" onclick="toggleProfileMenu()" aria-haspopup="true" aria-expanded="false">
+                        <span class="profile-menu__avatar" aria-hidden="true">🙍</span>
+                        <span class="profile-menu__label">
+                            <asp:Label ID="lblProfileEmail" runat="server" CssClass="profile-menu__email" />
+                            <asp:Label ID="lblProfileRole" runat="server" CssClass="profile-menu__role" />
+                        </span>
+                        <span class="profile-menu__caret" aria-hidden="true">▾</span>
+                    </button>
+                    <div class="profile-menu__dropdown" id="profileDropdown">
+                        <asp:LinkButton ID="lnkChangePassword" runat="server" CssClass="profile-menu__item" OnClick="lnkChangePassword_Click">🔑 Change Password</asp:LinkButton>
+                        <asp:LinkButton ID="lnkLogout" runat="server" CssClass="profile-menu__item profile-menu__item--danger" CausesValidation="false" OnClick="lnkLogout_Click">🚪 Log Out</asp:LinkButton>
+                    </div>
+                </asp:Panel>
+            </aside>
+
+            <div class="app-content">
+                <header class="app-topbar">
+                    <button type="button" class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+                        <span class="icon-light" aria-hidden="true">🌙</span>
+                        <span class="icon-dark" aria-hidden="true">☀️</span>
+                        <span class="theme-toggle__label">Toggle Theme</span>
+                    </button>
+                </header>
+
+                <main class="app-main">
+                    <asp:ContentPlaceHolder ID="MainContent" runat="server">
+                    </asp:ContentPlaceHolder>
+                </main>
+
+                <footer class="app-footer">
+                    Beverage Store Management System
+                </footer>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        function toggleTheme() {
+            var isDark = document.documentElement.className === 'dark-theme';
+            var newTheme = isDark ? 'light' : 'dark';
+            document.documentElement.className = newTheme === 'dark' ? 'dark-theme' : '';
+            localStorage.setItem('theme', newTheme);
+        }
+
+        function toggleProfileMenu() {
+            var dropdown = document.getElementById('profileDropdown');
+            var trigger = document.getElementById('profileTrigger');
+            if (!dropdown) return;
+            var isOpen = dropdown.classList.toggle('is-open');
+            if (trigger) trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        }
+
+        document.addEventListener('click', function (evt) {
+            var dropdown = document.getElementById('profileDropdown');
+            var trigger = document.getElementById('profileTrigger');
+            if (!dropdown || !dropdown.classList.contains('is-open')) return;
+            if (dropdown.contains(evt.target) || (trigger && trigger.contains(evt.target))) return;
+            dropdown.classList.remove('is-open');
+            if (trigger) trigger.setAttribute('aria-expanded', 'false');
+        });
+    </script>
+</body>
+</html>
